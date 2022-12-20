@@ -5,12 +5,31 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-      <service id="knp_u_lorem_ipsum.knp_uipsum" class="KnpU\LoremIpsumBundle\KnpUIpsum" public="true" >
-          <argument type="service" id="knpu_lorem_ipsum.word_provider" />
-      </service>
-        <service id="knp_u_lorem_ipsum.knpu_word_provider" class="KnpU\LoremIpsumBundle\KnpWordProvider"/>
+        <service id="knp_u_lorem_ipsum.knp_uipsum" class="KnpU\LoremIpsumBundle\KnpUIpsum" public="true">
+            <argument type="collection">
+            </argument>
+        </service>
+        <service id="knp_u_lorem_ipsum.knpu_word_provider" class="KnpU\LoremIpsumBundle\KnpWordProvider">
+            <tag name="knpu_ipsum_word_provider"/>
+        </service>
 
-        <service id="knpu_lorem_ipsum.word_provider"  alias="knp_u_lorem_ipsum.knpu_word_provider" />
-        <service id="KnpU\LoremIpsumBundle\KnpUIpsum" alias="knp_u_lorem_ipsum.knp_uipsum" public="false"/>
-    </services>
-</container>
+
+        <service id="knpu_lorem_ipsum.word_provider" alias="knp_u_lorem_ipsum.knpu_word_provider"/>
+    <service id="KnpU\LoremIpsumBundle\KnpUIpsum" alias="knp_u_lorem_ipsum.knp_uipsum" public="false"/>
+
+    <service id="knp_u_lorem_ipsum.ipsum_api_controller" class="KnpU\LoremIpsumBundle\Controller\IpsumApiController"
+             public="true">
+        <call method="setContainer">
+            <argument type="service" id="Psr\Container\ContainerInterface"/>
+        </call>
+        <tag name="container.service_subscriber"/>
+        <argument type="service" id="knp_u_lorem_ipsum.knp_uipsum"/>
+        <argument type="service" id="event_dispatcher" on-invalid="null"/>
+    </service>
+
+    <service id="knp_u_lorem_ipsum.response_subscriber"
+             class="KnpU\LoremIpsumBundle\EventSubscriber\AddMessageToIpsumApiSubscriber">
+        <tag name="kernel.event_subscriber"/>
+    </service>
+</services>
+        </container>
